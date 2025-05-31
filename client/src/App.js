@@ -7,7 +7,6 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLogin from './pages/auth/AdminLogin';
 import AdminSignup from './components/auth/AdminSignup';
 import AdminDashboard from './pages/admin/AdminDashboard';
-
 import OfficerLogin from './pages/auth/OfficerLogin';
 import CitizenLogin from './pages/auth/CitizenLogin';
 import OfficerSignup from './components/auth/OfficerSignup';
