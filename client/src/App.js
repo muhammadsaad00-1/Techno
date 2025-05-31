@@ -15,7 +15,9 @@ import Request from './pages/citizen/CitizenLoganIssue';
 import Profile from './pages/citizen/CitizenProfile';
 import AdminProfile from './pages/admin/AdminProfile';
 import AdminIssues from './pages/admin/AdminIssues';
+import AdminMessages from './pages/admin/AdminMessages';
 import AdminIssueDetails from './pages/admin/AdminIssueDetails';
+import AdminOfficers from './pages/admin/AdminOfficers';
 import MyRequests from './pages/citizen/CitizenRequests';
 import OfficerDashboard from './pages/officer/OfficerDashboard';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
@@ -42,6 +44,10 @@ function App() {
           <Route path="/adminprofile"element={<AdminProfile/>}/>
           <Route path="/adminissues"element={<AdminIssues/>}/>
           <Route path="/adminissuedetails/:issueId"element={<AdminIssueDetails/>}/>
+          <Route path="/adminmessage"element={<AdminMessages/>}/>
+          <Route path="/adminofficers"element={<AdminOfficers/>}/>
+
+
 
           
           {/* Officer Routes */}
