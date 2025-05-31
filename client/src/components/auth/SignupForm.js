@@ -10,6 +10,9 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../../firebase'; // 🔺 Adjust path if needed
+import { doc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default function SignupForm({ requiredDomain }) {
   const [email, setEmail] = useState('');
@@ -22,6 +25,17 @@ export default function SignupForm({ requiredDomain }) {
 
   const authContext = useAuth();
   const navigate = useNavigate();
+
+  const waitForUser = () =>
+    new Promise((resolve) => {
+      const auth = getAuth();
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          unsubscribe();
+          resolve(user);
+        }
+      });
+    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,22 +61,38 @@ export default function SignupForm({ requiredDomain }) {
       setError('');
       setLoading(true);
 
-      await authContext.signup(email, password);
+      // Signup user
+      const userCredential = await authContext.signup(email, password);
+
+      // Wait for auth state to update and get the current user
+      const user = await waitForUser();
+
+      console.log('User after signup:', user);
 
       const userDomain = email.split('@')[1];
-      let loginPath;
+      let collectionName;
 
+      if (userDomain === 'ad.com') collectionName = 'admins';
+      else if (userDomain === 'oi.com') collectionName = 'officers';
+      else collectionName = 'citizens';
+
+      // Store user data in Firestore
+      await setDoc(doc(db, collectionName, user.uid), {
+        email: user.email,
+        uid: user.uid,
+        createdAt: new Date().toISOString()
+      });
+
+      let loginPath;
       if (userDomain === 'ad.com') loginPath = '/admin/login';
       else if (userDomain === 'oi.com') loginPath = '/officer/login';
-      else if (userDomain === 'ui.com') loginPath = '/citizen/login';
-      else loginPath = '/';
+      else loginPath = '/citizen/login';
 
       navigate(loginPath, {
         state: {
           message: 'Account created successfully! Please log in.'
         }
       });
-
     } catch (error) {
       setError('Failed to create account: ' + error.message);
     } finally {

@@ -11,6 +11,9 @@ import OfficerLogin from './pages/auth/OfficerLogin';
 import CitizenLogin from './pages/auth/CitizenLogin';
 import OfficerSignup from './components/auth/OfficerSignup';
 import CitizenSignup from './components/auth/CitizenSignup';
+import Request from './pages/citizen/CitizenLoganIssue';
+import Profile from './pages/citizen/CitizenProfile';
+import MyRequests from './pages/citizen/CitizenRequests';
 import OfficerDashboard from './pages/officer/OfficerDashboard';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import HomePage from './pages/HomePage';
@@ -34,6 +37,11 @@ function App() {
           {/* Citizen Routes */}
           <Route path="/citizen/login" element={<CitizenLogin />} />
           <Route path="/citizen/signup" element={<CitizenSignup />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/request" element={<Request />} />
+          <Route path="/myrequests" element={<MyRequests />} />
+
+
 
           {/* Protected Dashboard Routes */}
           <Route
