@@ -10,6 +10,9 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../../firebase'; // 🔺 Adjust path if needed
+import { doc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default function SignupForm({ requiredDomain }) {
   const [email, setEmail] = useState('');
@@ -20,8 +23,24 @@ export default function SignupForm({ requiredDomain }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // New fields:
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+
   const authContext = useAuth();
   const navigate = useNavigate();
+
+  const waitForUser = () =>
+    new Promise((resolve) => {
+      const auth = getAuth();
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          unsubscribe();
+          resolve(user);
+        }
+      });
+    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +48,29 @@ export default function SignupForm({ requiredDomain }) {
     if (!authContext || typeof authContext.signup !== 'function') {
       setError('Authentication not properly configured. Please check your setup.');
       return;
+    }
+
+    // Validate new fields
+    if (!name.trim()) {
+      return setError('Name is required');
+    }
+    if (name.length > 50) {
+      return setError('Name cannot exceed 50 characters');
+    }
+
+    if (!phone.trim()) {
+      return setError('Phone number is required');
+    }
+    if (phone.length > 15) {
+      return setError('Phone number cannot exceed 15 characters');
+    }
+    // Optional: Add phone number regex validation here if needed
+
+    if (!address.trim()) {
+      return setError('Address is required');
+    }
+    if (address.length > 100) {
+      return setError('Address cannot exceed 100 characters');
     }
 
     if (password !== confirmPassword) {
@@ -47,22 +89,41 @@ export default function SignupForm({ requiredDomain }) {
       setError('');
       setLoading(true);
 
-      await authContext.signup(email, password);
+      // Signup user
+      const userCredential = await authContext.signup(email, password);
+
+      // Wait for auth state to update and get the current user
+      const user = await waitForUser();
+
+      console.log('User after signup:', user);
 
       const userDomain = email.split('@')[1];
-      let loginPath;
+      let collectionName;
 
+      if (userDomain === 'ad.com') collectionName = 'admins';
+      else if (userDomain === 'oi.com') collectionName = 'officers';
+      else collectionName = 'citizens';
+
+      // Store user data in Firestore, including new fields
+      await setDoc(doc(db, collectionName, user.uid), {
+        email: user.email,
+        uid: user.uid,
+        createdAt: new Date().toISOString(),
+        name: name.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+      });
+
+      let loginPath;
       if (userDomain === 'ad.com') loginPath = '/admin/login';
       else if (userDomain === 'oi.com') loginPath = '/officer/login';
-      else if (userDomain === 'ui.com') loginPath = '/citizen/login';
-      else loginPath = '/';
+      else loginPath = '/citizen/login';
 
       navigate(loginPath, {
         state: {
           message: 'Account created successfully! Please log in.'
         }
       });
-
     } catch (error) {
       setError('Failed to create account: ' + error.message);
     } finally {
@@ -72,7 +133,42 @@ export default function SignupForm({ requiredDomain }) {
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
+
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      {/* New TextFields */}
+
+      <TextField
+        fullWidth
+        label="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+        margin="normal"
+        inputProps={{ maxLength: 50 }}
+      />
+
+      <TextField
+        fullWidth
+        label="Phone Number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        required
+        margin="normal"
+        inputProps={{ maxLength: 15 }}
+      />
+
+      <TextField
+        fullWidth
+        label="Address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        required
+        margin="normal"
+        inputProps={{ maxLength: 100 }}
+      />
+
+      {/* Existing fields */}
 
       <TextField
         fullWidth

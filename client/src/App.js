@@ -11,6 +11,12 @@ import OfficerLogin from './pages/auth/OfficerLogin';
 import CitizenLogin from './pages/auth/CitizenLogin';
 import OfficerSignup from './components/auth/OfficerSignup';
 import CitizenSignup from './components/auth/CitizenSignup';
+import Request from './pages/citizen/CitizenLoganIssue';
+import Profile from './pages/citizen/CitizenProfile';
+import AdminProfile from './pages/admin/AdminProfile';
+import AdminIssues from './pages/admin/AdminIssues';
+import AdminIssueDetails from './pages/admin/AdminIssueDetails';
+import MyRequests from './pages/citizen/CitizenRequests';
 import OfficerDashboard from './pages/officer/OfficerDashboard';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import HomePage from './pages/HomePage';
@@ -33,6 +39,10 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/signup" element={<AdminSignup />} />
+          <Route path="/adminprofile"element={<AdminProfile/>}/>
+          <Route path="/adminissues"element={<AdminIssues/>}/>
+          <Route path="/adminissuedetails/:issueId"element={<AdminIssueDetails/>}/>
+
           
           {/* Officer Routes */}
           <Route path="/officer/login" element={<OfficerLogin />} />
@@ -41,6 +51,11 @@ function App() {
           {/* Citizen Routes */}
           <Route path="/citizen/login" element={<CitizenLogin />} />
           <Route path="/citizen/signup" element={<CitizenSignup />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/request" element={<Request />} />
+          <Route path="/myrequests" element={<MyRequests />} />
+
+
 
           {/* Protected Dashboard Routes */}
           <Route
