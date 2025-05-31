@@ -1,43 +1,67 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminLogin from './pages/auth/AdminLogin';
+import OfficerLogin from './pages/auth/OfficerLogin';
+import CitizenLogin from './pages/auth/CitizenLogin';
+import AdminSignup from './components/auth/AdminSignup';
+import OfficerSignup from './components/auth/OfficerSignup';
+import CitizenSignup from './components/auth/CitizenSignup';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import OfficerDashboard from './pages/officer/OfficerDashboard';
+import CitizenDashboard from './pages/citizen/CitizenDashboard';
+import HomePage from './pages/HomePage';
+
 
 function App() {
-  const [notes, setNotes] = useState([]);
-  const [text, setText] = useState('');
-
-  useEffect(() => {
-    axios.get('http://localhost:5000/notes')
-      .then(res => setNotes(res.data));
-  }, []);
-
-  const addNote = () => {
-    axios.post('http://localhost:5000/notes', { text })
-      .then(res => {
-        setNotes(prev => [...prev, res.data]);
-        setText('');
-      });
-  };
-
-  const deleteNote = (id) => {
-    axios.delete(`http://localhost:5000/notes/${id}`)
-      .then(() => {
-        setNotes(prev => prev.filter(note => note.id !== id));
-      });
-  };
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Notes App</h1>
-      <input value={text} onChange={e => setText(e.target.value)} placeholder="Write a note..." />
-      <button onClick={addNote}>Add</button>
-      <ul>
-        {notes.map(note => (
-          <li key={note.id}>
-            {note.text} <button onClick={() => deleteNote(note.id)}>❌</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/signup" element={<AdminSignup />} />
+          
+          {/* Officer Routes */}
+          <Route path="/officer/login" element={<OfficerLogin />} />
+          <Route path="/officer/signup" element={<OfficerSignup />} />
+          
+          {/* Citizen Routes */}
+          <Route path="/citizen/login" element={<CitizenLogin />} />
+          <Route path="/citizen/signup" element={<CitizenSignup />} />
+
+          {/* Protected Dashboard Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/officer/dashboard"
+            element={
+              <ProtectedRoute requiredRole="officer">
+                <OfficerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/citizen/dashboard"
+            element={
+              <ProtectedRoute requiredRole="citizen">
+                <CitizenDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
