@@ -5,12 +5,13 @@ import {
   Box,
   Alert,
   InputAdornment,
-  IconButton
+  IconButton,
+  useTheme
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../../firebase'; // 🔺 Adjust path if needed
+import { db } from '../../firebase'; 
 import { doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -30,6 +31,7 @@ export default function SignupForm({ requiredDomain }) {
 
   const authContext = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const waitForUser = () =>
     new Promise((resolve) => {
@@ -132,11 +134,67 @@ export default function SignupForm({ requiredDomain }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
-
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-      {/* New TextFields */}
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit}
+      sx={{
+        position: 'relative',
+        p: 3,
+        borderRadius: '16px',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, rgba(26, 35, 126, 0.15) 0%, rgba(13, 71, 161, 0.15) 50%, rgba(1, 87, 155, 0.15) 100%)',
+          borderRadius: '16px',
+          zIndex: -1,
+          animation: 'pulse 8s infinite',
+          '@keyframes pulse': {
+            '0%': { transform: 'scale(1)', opacity: 0.8 },
+            '50%': { transform: 'scale(1.02)', opacity: 1 },
+            '100%': { transform: 'scale(1)', opacity: 0.8 }
+          }
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          top: -2,
+          left: -2,
+          right: -2,
+          bottom: -2,
+          background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
+          borderRadius: '18px',
+          zIndex: -2,
+          opacity: 0.1,
+          filter: 'blur(8px)',
+          animation: 'glow 4s infinite',
+          '@keyframes glow': {
+            '0%': { opacity: 0.1 },
+            '50%': { opacity: 0.2 },
+            '100%': { opacity: 0.1 }
+          }
+        }
+      }}
+    >
+      {error && (
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            borderRadius: '8px',
+            animation: 'slideIn 0.3s ease-out',
+            '@keyframes slideIn': {
+              '0%': { transform: 'translateY(-10px)', opacity: 0 },
+              '100%': { transform: 'translateY(0)', opacity: 1 }
+            }
+          }}
+        >
+          {error}
+        </Alert>
+      )}
 
       <TextField
         fullWidth
@@ -146,6 +204,20 @@ export default function SignupForm({ requiredDomain }) {
         required
         margin="normal"
         inputProps={{ maxLength: 50 }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
       />
 
       <TextField
@@ -156,6 +228,20 @@ export default function SignupForm({ requiredDomain }) {
         required
         margin="normal"
         inputProps={{ maxLength: 15 }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
       />
 
       <TextField
@@ -166,9 +252,21 @@ export default function SignupForm({ requiredDomain }) {
         required
         margin="normal"
         inputProps={{ maxLength: 100 }}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
       />
-
-      {/* Existing fields */}
 
       <TextField
         fullWidth
@@ -179,6 +277,20 @@ export default function SignupForm({ requiredDomain }) {
         required
         margin="normal"
         helperText={requiredDomain && `Must use @${requiredDomain} email`}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
       />
 
       <TextField
@@ -190,6 +302,20 @@ export default function SignupForm({ requiredDomain }) {
         required
         margin="normal"
         helperText="Minimum 6 characters"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -197,6 +323,13 @@ export default function SignupForm({ requiredDomain }) {
                 aria-label="toggle password visibility"
                 onClick={() => setShowPassword((prev) => !prev)}
                 edge="end"
+                sx={{
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    color: theme.palette.primary.main
+                  }
+                }}
               >
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
@@ -213,6 +346,20 @@ export default function SignupForm({ requiredDomain }) {
         onChange={(e) => setConfirmPassword(e.target.value)}
         required
         margin="normal"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            '&.Mui-focused': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }
+          }
+        }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -220,6 +367,13 @@ export default function SignupForm({ requiredDomain }) {
                 aria-label="toggle confirm password visibility"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 edge="end"
+                sx={{
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    color: theme.palette.primary.main
+                  }
+                }}
               >
                 {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
@@ -233,7 +387,26 @@ export default function SignupForm({ requiredDomain }) {
         fullWidth
         variant="contained"
         disabled={loading}
-        sx={{ mt: 3, mb: 2 }}
+        sx={{ 
+          mt: 3, 
+          mb: 2,
+          height: '48px',
+          borderRadius: '8px',
+          background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            background: 'linear-gradient(135deg, #0d47a1 0%, #01579b 50%, #1a237e 100%)',
+          },
+          '&:active': {
+            transform: 'translateY(0)',
+          },
+          '&.Mui-disabled': {
+            background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
+            opacity: 0.7
+          }
+        }}
       >
         {loading ? 'Creating Account...' : 'Sign Up'}
       </Button>

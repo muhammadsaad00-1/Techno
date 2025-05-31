@@ -1,0 +1,120 @@
+import React from 'react';
+import SignupForm from '../../components/auth/SignupForm';
+import { Box, Container, Paper, Typography, Link as MuiLink } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+export default function OfficerSignup() {
+  return (
+    <Box sx={{
+      minHeight: '100vh',
+      width: '100vw',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: -10,
+      background: 'linear-gradient(135deg, #e3f0ff 0%, #f8fafc 100%)',
+    }}>
+      <Container maxWidth="xs" sx={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 4, 
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: '24px',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
+            background: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <Box 
+            textAlign="center" 
+            mb={3}
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              animation: 'fadeIn 0.5s ease-out',
+              '@keyframes fadeIn': {
+                '0%': { opacity: 0, transform: 'translateY(-20px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' }
+              }
+            }}
+          >
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                mb: 1,
+                background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 'bold'
+              }}
+            >
+              Officer Sign Up
+            </Typography>
+            <Typography 
+              variant="subtitle1"
+              sx={{
+                color: 'text.secondary',
+                animation: 'slideIn 0.5s ease-out 0.2s both',
+                '@keyframes slideIn': {
+                  '0%': { opacity: 0, transform: 'translateX(-20px)' },
+                  '100%': { opacity: 1, transform: 'translateX(0)' }
+                }
+              }}
+            >
+              Create your officer account with @oi.com email
+            </Typography>
+          </Box>
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            <SignupForm requiredDomain="oi.com" />
+          </Box>
+          <Box 
+            mt={2} 
+            textAlign="center"
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              animation: 'fadeIn 0.5s ease-out 0.4s both',
+              '@keyframes fadeIn': {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 }
+              }
+            }}
+          >
+            <Typography variant="body2">
+              Already have an account?{' '}
+              <MuiLink 
+                component={Link} 
+                to="/officer/login"
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  position: 'relative',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    width: '100%',
+                    height: '2px',
+                    bottom: -2,
+                    left: 0,
+                    background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'right',
+                    transition: 'transform 0.3s ease'
+                  },
+                  '&:hover::after': {
+                    transform: 'scaleX(1)',
+                    transformOrigin: 'left'
+                  }
+                }}
+              >
+                Login
+              </MuiLink>
+            </Typography>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
+  );
+} 
