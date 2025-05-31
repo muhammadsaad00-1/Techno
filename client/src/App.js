@@ -15,6 +15,13 @@ import OfficerDashboard from './pages/officer/OfficerDashboard';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import HomePage from './pages/HomePage';
 
+// Cloudinary configuration
+export const cloudinaryConfig = {
+  cloudName: 'dnvw7bf0s',
+  apiKey: '186372565143528',
+  apiSecret: 'PG5XU6lvNsZ1V69MMTK4ATW_JvU'
+};
+
 function App() {
   return (
     <Router>
