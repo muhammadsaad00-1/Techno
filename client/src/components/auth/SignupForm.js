@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { TextField, Button, Box, Alert } from '@mui/material';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Alert } from '@mui/material';
 
 export default function SignupForm({ requiredDomain }) {
   const [email, setEmail] = useState('');
@@ -10,79 +9,113 @@ export default function SignupForm({ requiredDomain }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const authContext = useAuth();
   const navigate = useNavigate();
+
+  // Debug: Check what we get from useAuth
+  console.log('Auth context:', authContext);
+  console.log('Signup function:', authContext?.signup);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate domain
-    const domain = email.split('@')[1];
-    if (domain !== requiredDomain) {
-      setError(`Please use a @${requiredDomain} email address`);
+    // Check if signup function exists
+    if (!authContext || typeof authContext.signup !== 'function') {
+      setError('Authentication not properly configured. Please check your setup.');
       return;
     }
-
+    
+    // Validation
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      return setError('Passwords do not match');
     }
-
-    setLoading(true);
-    setError('');
-
+    
+    if (password.length < 6) {
+      return setError('Password must be at least 6 characters');
+    }
+    
+    // Check email domain if required
+    if (requiredDomain && !email.endsWith(`@${requiredDomain}`)) {
+      return setError(`Email must end with @${requiredDomain}`);
+    }
+    
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // The redirection will be handled by the ProtectedRoute component
-    } catch (err) {
-      setError(err.message);
+      setError('');
+      setLoading(true);
+      
+      await authContext.signup(email, password);
+      
+      // Determine login path based on email domain
+      const userDomain = email.split('@')[1];
+      let loginPath;
+      
+      if (userDomain === 'ad.com') {
+        loginPath = '/admin/login';
+      } else if (userDomain === 'oi.com') {
+        loginPath = '/officer/login';
+      } else if (userDomain === 'ui.com') {
+        loginPath = '/citizen/login';
+      } else {
+        loginPath = '/';
+      }
+      
+      // Navigate to appropriate login page
+      navigate(loginPath, { 
+        state: { 
+          message: 'Account created successfully! Please log in.' 
+        }
+      });
+      
+    } catch (error) {
+      setError('Failed to create account: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-      {error && <Alert severity="error">{error}</Alert>}
+    <Box component="form" onSubmit={handleSubmit}>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      
       <TextField
-        margin="normal"
-        required
         fullWidth
-        id="email"
-        label="Email Address"
-        name="email"
-        autoComplete="email"
-        autoFocus
+        label="Email"
+        type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-      />
-      <TextField
-        margin="normal"
         required
+        margin="normal"
+        helperText={requiredDomain && `Must use @${requiredDomain} email`}
+      />
+      
+      <TextField
         fullWidth
-        name="password"
         label="Password"
         type="password"
-        id="password"
-        autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      />
-      <TextField
-        margin="normal"
         required
+        margin="normal"
+        helperText="Minimum 6 characters"
+      />
+      
+      <TextField
         fullWidth
-        name="confirmPassword"
         label="Confirm Password"
         type="password"
-        id="confirmPassword"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        margin="normal"
       />
+      
       <Button
         type="submit"
         fullWidth
         variant="contained"
-        sx={{ mt: 3, mb: 2 }}
         disabled={loading}
+        sx={{ mt: 3, mb: 2 }}
       >
         {loading ? 'Creating Account...' : 'Sign Up'}
       </Button>
