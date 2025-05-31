@@ -72,13 +72,7 @@ export default function CitizenDashboard() {
           </Button>
         </Box>
 
-        {/* ✅ Mapbox Map added below */}
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Your Area Map
-          </Typography>
-          <MapboxMap />
-        </Box>
+    
       </Container>
     </>
   );

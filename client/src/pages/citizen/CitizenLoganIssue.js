@@ -15,6 +15,7 @@ import {
 import { db } from '../../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
+import MapboxMap from '../../components/Map'; // Your updated map component
 
 export default function LogIssue() {
   const [subject, setSubject] = useState('');
@@ -22,6 +23,9 @@ export default function LogIssue() {
   const [area, setArea] = useState('');
   const [department, setDepartment] = useState('');
   const [images, setImages] = useState([]);
+
+  // New states to hold coordinates
+  const [selectedLocation, setSelectedLocation] = useState(null); // { latitude, longitude, address }
 
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -46,6 +50,12 @@ export default function LogIssue() {
     }, 2000);
   };
 
+  // This is the callback we pass to MapboxMap:
+  const handleLocationSelect = ({ latitude, longitude, address }) => {
+    setSelectedLocation({ latitude, longitude, address });
+    setArea(address); // Optional: auto-fill the Area input field with address
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,6 +69,11 @@ export default function LogIssue() {
       return;
     }
 
+    if (!selectedLocation) {
+      showError('Please select a location on the map.');
+      return;
+    }
+
     try {
       const issueData = {
         subject,
@@ -67,7 +82,12 @@ export default function LogIssue() {
         department,
         userEmail: currentUser.email,
         createdAt: serverTimestamp(),
-        status: 'pending'
+        status: 'pending',
+        location: {
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          address: selectedLocation.address,
+        },
       };
 
       await addDoc(collection(db, 'issues'), issueData);
@@ -80,6 +100,7 @@ export default function LogIssue() {
       setArea('');
       setDepartment('');
       setImages([]);
+      setSelectedLocation(null);
     } catch (error) {
       console.error('Error submitting complaint:', error);
       showError('Failed to submit complaint.');
@@ -149,13 +170,7 @@ export default function LogIssue() {
 
       <Button variant="contained" component="label" sx={{ mt: 2 }}>
         Upload Images
-        <input
-          hidden
-          accept="image/*"
-          multiple
-          type="file"
-          onChange={handleImageChange}
-        />
+        <input hidden accept="image/*" multiple type="file" onChange={handleImageChange} />
       </Button>
 
       {images.length > 0 && (
@@ -164,15 +179,16 @@ export default function LogIssue() {
         </Typography>
       )}
 
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        sx={{ mt: 4 }}
-      >
+      <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 4 }}>
         Submit Complaint
       </Button>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Your Area Map
+        </Typography>
+        <MapboxMap onLocationSelect={handleLocationSelect} />
+      </Box>
 
       <Snackbar
         open={snackbar.open}
